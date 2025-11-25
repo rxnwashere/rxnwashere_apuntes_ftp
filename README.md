@@ -173,6 +173,10 @@ El propietario de la raiz del usuario anónimo por defecto es **root**, se puede
 chroot_local_user=YES
 ```
 
+**Ejemplo**:
+
+![alt text](imgs/03.png)
+
 **Problema habitual:**
 
 El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos.
@@ -218,7 +222,17 @@ sudo a2enmod userdir
 sudo systemctl reload apache2
 ```
 
-URL de acceso:
+**Crear archivo <code>index.html</code> y subirlo**:
+
+```html
+<h1>Bienvenido a user dir</h1>
+```
+
+```bash
+ftp> put index.html
+```
+
+**URL de acceso**:
 
 ```
 http://host/~usuario
@@ -226,14 +240,14 @@ http://host/~usuario
 
 # 10. Conexión Gráfica con FileZilla
 
-FileZilla permite probar:
+FileZilla es un cliente de FTP que nos permite manejar el protocolo con una interfaz gráfica.
 
- - ✔ Usuario normal
- - ✔ Usuario enjaulado
- - ✔ Usuario anónimo
- - ✔ Conexión segura (SFTP)
+Para utilizarlo tenemos que instalarlo en la máquina cliente:
 
-Si el usuario está enjaulado, FileZilla mostrará `/` aunque realmente esté en `/home/usuario`.
+```bash
+sudo apt install filezilla
+```
+
 
 
 # 11. Conexión Segura con SFTP
