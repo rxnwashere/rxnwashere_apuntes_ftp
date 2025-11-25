@@ -9,7 +9,7 @@
 5. [Forzar Modo Activo o Pasivo](#5-forzar-modo-activo-o-pasivo)
 6. [Usuarios Anónimos](#6-usuarios-anónimos)
 7. [Enjaular (Chroot) Usuarios FTP](#7-enjaular-chroot-usuarios-ftp)
-8. [Excepciones a la Cárcel (chroot_list)](#8-excepciones-a-la-cárcel-chroot_list)
+8. [Excepciones a la jaula (chroot_list)](#8-excepciones-a-la-jaula-chroot_list)
 9. [Userdir + Apache + FTP](#9-userdir--apache--ftp)
 10. [Conexión Gráfica con FileZilla](#10-conexión-gráfica-con-filezilla)
 11. [Conexión Segura con SFTP](#11-conexión-segura-con-sftp)
@@ -173,6 +173,10 @@ El propietario de la raiz del usuario anónimo por defecto es **root**, se puede
 chroot_local_user=YES
 ```
 
+**Ejemplo**:
+
+![alt text](imgs/03.png)
+
 **Problema habitual:**
 
 El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos.
@@ -218,7 +222,17 @@ sudo a2enmod userdir
 sudo systemctl reload apache2
 ```
 
-URL de acceso:
+**Crear archivo <code>index.html</code> y subirlo**:
+
+```html
+<h1>Bienvenido a user dir</h1>
+```
+
+```bash
+ftp> put index.html
+```
+
+**URL de acceso**:
 
 ```
 http://host/~usuario
@@ -226,15 +240,26 @@ http://host/~usuario
 
 # 10. Conexión Gráfica con FileZilla
 
-FileZilla permite probar:
+FileZilla es un cliente de FTP que nos permite manejar el protocolo con una interfaz gráfica.
 
- - ✔ Usuario normal
- - ✔ Usuario enjaulado
- - ✔ Usuario anónimo
- - ✔ Conexión segura (SFTP)
+Para utilizarlo tenemos que instalarlo en la máquina cliente:
 
-Si el usuario está enjaulado, FileZilla mostrará `/` aunque realmente esté en `/home/usuario`.
+```bash
+sudo apt install filezilla
+```
 
+Cuando abramos FileZilla veremos los siguientes campos para conectarnos con el servidor:
+
+- Servidor (IP del servidor a conectarnos)
+- Nombre de usuario (Nombre de usuario existente en el servidor)
+- Contraseña (Contraseña del usuario)
+- Puerto (Puedes especificar un puerto si lo deseas, por defecto usa el 21 y para SFTP puedes utilizar el 22).
+
+**Ejemplo de conexión con FileZilla**:
+
+![alt text](imgs/04.png)
+
+En este caso nos hemos conectado con un usuario que no está enjaulado, por eso podemos ver todo el sistema de archivos del servidor.
 
 # 11. Conexión Segura con SFTP
 
@@ -246,8 +271,7 @@ Notas importantes:
 
 * **No usa FTP**, sino SSH.
 * Todo el tráfico va cifrado.
-* Wireshark lo identifica como SSH, no como FTP.
-
+* Si escaneamos la red con un sniffer (ej.: Wireshark) lo identifica como SSH, no como FTP.
 
 # 12. Enjaular Usuarios SFTP con SSH
 
