@@ -116,6 +116,14 @@ Después de modificar:
 sudo systemctl reload vsftpd
 ```
 
+Consulta de logs:
+
+Los logs de vsftpd se encuentran en la siguiente ruta:
+
+```bash
+
+```
+
 # 5. Forzar Modo Activo o Pasivo
 
 ## 🔵 Forzar modo activo
@@ -207,7 +215,11 @@ aaron
 
 Solo deben añadirse los nombres de los usuarios que no se quieren enjaular, no hayq que especificar nada más.
 
-# 9. Userdir + Apache + FTP
+# 9. Mensaje de bienvenida personalizado
+
+
+
+# 1X. Userdir + Apache + FTP
 
 Permite que cada usuario tenga su propia web:
 
@@ -238,7 +250,7 @@ ftp> put index.html
 http://host/~usuario
 ```
 
-# 10. Conexión Gráfica con FileZilla
+# 1X. Conexión Gráfica con FileZilla
 
 FileZilla es un cliente de FTP que nos permite manejar el protocolo con una interfaz gráfica.
 
@@ -261,7 +273,7 @@ Cuando abramos FileZilla veremos los siguientes campos para conectarnos con el s
 
 En este caso nos hemos conectado con un usuario que no está enjaulado, por eso podemos ver todo el sistema de archivos del servidor.
 
-# 11. Conexión Segura con SFTP
+# 1X. Conexión Segura con SFTP
 
 ```bash
 sftp usuario@servidor
@@ -273,7 +285,7 @@ Notas importantes:
 * Todo el tráfico va cifrado.
 * Si escaneamos la red con un sniffer (ej.: Wireshark) lo identifica como SSH, no como FTP.
 
-# 12. Enjaular Usuarios SFTP con SSH
+# 1X. Enjaular Usuarios SFTP con SSH
 
 Editar `/etc/ssh/sshd_config`:
 
@@ -307,7 +319,15 @@ Reiniciar SSH:
 sudo systemctl reload sshd
 ```
 
-# 13. Enlaces de Interés
+# 1X. Comandos útiles
+
+<code>ss -tlnp | grep :(puerto)</code> --> Muestra los procesos que escuchan el puerto especificado. Puede servirte para comprobar que FTP está escuchando por el puerto 21.
+
+<code>sudo watch "netstat -atunp | grep vsftpd"</code> --> Muestra en tiempo real los puertos abiertos por vsftpd.
+
+
+
+# 1X. Enlaces de Interés
 
 * Directivas VSFTPD
   [http://vsftpd.beasts.org/vsftpd_conf.html](http://vsftpd.beasts.org/vsftpd_conf.html)
