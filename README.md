@@ -1,6 +1,6 @@
 # [📘 Apuntes de FTP y VSFTPD](https://rxnwashere.github.io/rxnwashere_apuntes_ftp/)
 
-# 📑 Índice (corregido)
+## 📑 Índice
 
 1. [Introducción a FTP](#1-introducción-a-ftp)
 2. [Modos de Transferencia: Activo y Pasivo](#2-modos-de-transferencia-activo-y-pasivo)
