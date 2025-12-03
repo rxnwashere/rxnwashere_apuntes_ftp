@@ -384,6 +384,7 @@ code {
 <li><a href="#14-conexi%C3%B3n-segura-con-sftp">Conexión Segura con SFTP</a></li>
 <li><a href="#15-enjaular-usuarios-sftp-con-ssh">Enjaular Usuarios SFTP con SSH</a></li>
 <li><a href="#16-comandos-%C3%BAtiles">Comandos Útiles</a></li>
+<li><a href="#17-troubleshooting-errores-comunes">Troubleshooting (Errores comunes)</a></li>
 <li><a href="#17-enlaces-de-inter%C3%A9s">Enlaces de Interés</a></li>
 </ol>
 <h1 id="1-introducci%C3%B3n-a-ftp">1. Introducción a FTP</h1>
@@ -505,7 +506,7 @@ sudo chmod 777 /srv/ftp/upload
 <p><strong>Ejemplo</strong>:</p>
 <p><img src="imgs/03.png" alt="alt text"></p>
 <p><strong>Problema habitual:</strong></p>
-<p>El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos.</p>
+<p>El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos. (Consulta <a href="#17-troubleshooting-errores-comunes">17. Troubleshooting (Erroes comunes)</a>)</p>
 <h1 id="8-excepciones-a-la-jaula-chrootlist">8. Excepciones a la jaula (chroot_list)</h1>
 <p>Crear archivo (o editar si ya existe o ya se ha creado previamente):</p>
 <pre class="hljs"><code><div>/etc/vsftpd.chroot_list
@@ -606,7 +607,51 @@ sudo chmod 755 /home/nombreusuario/upload
 <h1 id="16-comandos-%C3%BAtiles">16. Comandos útiles</h1>
 <p><code>ss -tlnp | grep :(puerto)</code> --&gt; Muestra los procesos que escuchan el puerto especificado. Puede servirte para comprobar que FTP está escuchando por el puerto 21.</p>
 <p><code>sudo watch &quot;netstat -atunp | grep vsftpd&quot;</code> --&gt; Muestra en tiempo real los puertos abiertos por vsftpd.</p>
-<h1 id="17-enlaces-de-inter%C3%A9s">17. Enlaces de Interés</h1>
+<h1 id="17-troubleshooting-errores-comunes">17. Troubleshooting (Errores comunes)</h1>
+<p><strong>Permisos incorrectos en chroot</strong>:</p>
+<pre class="hljs"><code><div>500 OOPS: vsftpd: refusing to run with writable root inside chroot()
+</div></code></pre>
+<p>Es muy común que cuando trabajemos con usuarios enjaulados no configuremos bien los permisos en su raíz y por tanto no podamos conectarnos a FTP.</p>
+<p>Para arreglar esto, configuraremos los permisos de <code>/home/usuario</code> de la siguiente forma:</p>
+<pre class="hljs"><code><div>sudo chmod 755 /home/usuario
+sudo chown root:root /home/usuario
+</div></code></pre>
+<p>Con esto:</p>
+<ul>
+<li>
+<p>Cambiamos los permisos para que <strong>el usuario propietario tenga control total sobre el directorio</strong>, pero <strong>el resto de usuarios solo tenga permiso para acceder</strong>.</p>
+</li>
+<li>
+<p>Cambiamos el propietario del directorio a <strong><code>root</code></strong></p>
+</li>
+</ul>
+<p>Luego para permitir la descarga o creación de archivos crearemos un directorio dentro de la raiz del usuario enjaulado:</p>
+<pre class="hljs"><code><div>sudo mkdir -p /home/usuario/ftp
+sudo chmod 755 /home/usuario/ftp
+sudo chown usuario:usuario /home/usuario/ftp
+</div></code></pre>
+<p><strong>Problemas con el firewall</strong></p>
+<p>Otro de los problemas más comunes es el firewall bloqueando el puerto de control (21) o los puertos del modo pasivo.</p>
+<p>Para solucionar esto tenemos dos soluciones:</p>
+<ul>
+<li><strong>Desactivar completamente el firewall:</strong></li>
+</ul>
+<pre class="hljs"><code><div>sudo ufw <span class="hljs-built_in">disable</span>
+</div></code></pre>
+<p>Luego puedes reactivarlo:</p>
+<pre class="hljs"><code><div>sudo ufw <span class="hljs-built_in">enable</span>
+</div></code></pre>
+<p>Si desconoces el estado del firewall puedes comprobarlo:</p>
+<pre class="hljs"><code><div>sudo ufw status
+Estado: inactivo/activo
+</div></code></pre>
+<ul>
+<li><strong>Habilitar acceso a los puertos 21 y los que estés utilizando en modo pasivo:</strong></li>
+</ul>
+<pre class="hljs"><code><div>sudo ufw allow 21/tcp
+sudo ufw allow 10000:10005/tcp
+</div></code></pre>
+<h1 id="18-enlaces-de-inter%C3%A9s">18. Enlaces de Interés</h1>
 <ul>
 <li>
 <p>Directivas VSFTPD

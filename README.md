@@ -18,7 +18,8 @@
 14. [Conexión Segura con SFTP](#14-conexión-segura-con-sftp)
 15. [Enjaular Usuarios SFTP con SSH](#15-enjaular-usuarios-sftp-con-ssh)
 16. [Comandos Útiles](#16-comandos-útiles)
-17. [Enlaces de Interés](#17-enlaces-de-interés)
+17. [Troubleshooting (Errores comunes)](#17-troubleshooting-errores-comunes)
+18. [Enlaces de Interés](#17-enlaces-de-interés)
 
 # 1. Introducción a FTP
 
@@ -193,7 +194,7 @@ chroot_local_user=YES
 
 **Problema habitual:**
 
-El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos.
+El directorio home no puede ser escribible por seguridad, así que se debe crear una subcarpeta para subir archivos. (Consulta [17. Troubleshooting (Erroes comunes)](#17-troubleshooting-errores-comunes))
 
 # 8. Excepciones a la jaula (chroot_list)
 
@@ -363,7 +364,70 @@ sudo systemctl reload sshd
 
 <code>sudo watch "netstat -atunp | grep vsftpd"</code> --> Muestra en tiempo real los puertos abiertos por vsftpd.
 
-# 17. Enlaces de Interés
+# 17. Troubleshooting (Errores comunes)
+
+**Permisos incorrectos en chroot**:
+
+```bash
+500 OOPS: vsftpd: refusing to run with writable root inside chroot()
+```
+
+Es muy común que cuando trabajemos con usuarios enjaulados no configuremos bien los permisos en su raíz y por tanto no podamos conectarnos a FTP.
+
+Para arreglar esto, configuraremos los permisos de <code>/home/usuario</code> de la siguiente forma:
+
+```bash
+sudo chmod 755 /home/usuario
+sudo chown root:root /home/usuario
+```
+
+Con esto:
+
+- Cambiamos los permisos para que **el usuario propietario tenga control total sobre el directorio**, pero **el resto de usuarios solo tenga permiso para acceder**.
+
+- Cambiamos el propietario del directorio a **<code>root</code>**
+
+Luego para permitir la descarga o creación de archivos crearemos un directorio dentro de la raiz del usuario enjaulado:
+
+```bash
+sudo mkdir -p /home/usuario/ftp
+sudo chmod 755 /home/usuario/ftp
+sudo chown usuario:usuario /home/usuario/ftp
+```
+
+**Problemas con el firewall**
+
+Otro de los problemas más comunes es el firewall bloqueando el puerto de control (21) o los puertos del modo pasivo.
+
+Para solucionar esto tenemos dos soluciones:
+
+- **Desactivar completamente el firewall:**
+
+```bash
+sudo ufw disable
+```
+
+Luego puedes reactivarlo:
+
+```bash
+sudo ufw enable
+```
+
+Si desconoces el estado del firewall puedes comprobarlo:
+
+```bash
+sudo ufw status
+Estado: inactivo/activo
+```
+
+- **Habilitar acceso a los puertos 21 y los que estés utilizando en modo pasivo:**
+
+```bash
+sudo ufw allow 21/tcp
+sudo ufw allow 10000:10005/tcp
+```
+
+# 18. Enlaces de Interés
 
 * Directivas VSFTPD
   [http://vsftpd.beasts.org/vsftpd_conf.html](http://vsftpd.beasts.org/vsftpd_conf.html)
